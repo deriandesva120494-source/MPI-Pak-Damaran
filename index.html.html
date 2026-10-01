@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Tanggo Rajo Files - Misteri Bunga Bank Pak Damaran</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']], processEscapes: true },
+    options: { ignoreHtmlClass: 'tex2jax_ignore', processHtmlClass: 'tex2jax_process' }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root {
+    --bg-dark: #0F172A;
+    --card-bg: #1E293B;
+    --accent-gold: #D97706;
+    --accent-gold-light: #FBBF24;
+    --accent-red: #DC2626;
+    --text-light: #F8FAFC;
+    --text-muted: #94A3B8;
+    --garis: #334155;
+    --hijau-tua: #059669;
+    --salah: #EF4444; 
+    --bayang-kecil: 0 10px 25px rgba(0, 0, 0, 0.4);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0; height: 100%; width: 100%;
+    background: var(--bg-dark); overflow: hidden;
+    font-family: 'Nunito', 'Segoe UI', Tahoma, system-ui, sans-serif;
+    color: var(--text-light); touch-action: manipulation;
+  }
+  #viewport { position: fixed; inset: 0; overflow: hidden; }
+  #stage {
+    position: absolute; top: 0; left: 0; width: 1280px; height: 720px;
+    transform-origin: top left; background: #0B1329;
+    overflow: hidden; user-select: none; border-radius: 20px;
+  }
+  .screen { position: absolute; inset: 0; display: none; flex-direction: column; }
+  .screen.active { display: flex; animation: fade .4s cubic-bezier(0.4, 0, 0.2, 1); }
+  @keyframes fade { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: none; } }
+  .bg { position: absolute; inset: 0; background: radial-gradient(circle at center, #1E293B 0%, #0F172A 100%); z-index: 0; }
+
+  /* Topbar */
+  .topbar {
+    position: relative; z-index: 10; height: 75px; flex: 0 0 75px;
+    display: flex; align-items: center; gap: 14px; padding: 0 30px;
+    background: var(--card-bg); border-bottom: 2px solid var(--accent-gold);
+    border-radius: 0 0 25px 25px; box-shadow: var(--bayang-kecil);
+  }
+  .topbar .judul-bar { font-weight: 800; font-size: 19px; color: var(--accent-gold-light); }
+  .topbar .judul-bar small { display: block; font-weight: 600; font-size: 12px; color: var(--text-muted); }
+  .spacer { flex: 1; }
+  .progress-wrap { display: flex; align-items: center; gap: 10px; color: var(--text-light); }
+  .progress-track { width: 140px; height: 14px; border-radius: 99px; background: #334155; overflow: hidden; }
+  .progress-fill { height: 100%; width: 0%; border-radius: 99px; background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light)); transition: width .5s ease; }
+  .progress-label { font-size: 13px; font-weight: 800; }
+  .skor-badge {
+    background: #451A03; border: 2px solid var(--accent-gold); padding: 5px 15px;
+    border-radius: 99px; font-weight: 900; font-size: 15px; color: var(--accent-gold-light);
+  }
+  .icon-btn {
+    width: 44px; height: 44px; border: 2px solid var(--accent-gold); border-radius: 50%; cursor: pointer;
+    background: var(--card-bg); color: var(--accent-gold-light); font-size: 18px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center; transition: all .2s;
+  }
+  .icon-btn:hover { background: var(--accent-gold); color: #000; }
+  
+  .content { position: relative; z-index: 4; flex: 1; padding: 20px 30px; overflow: hidden; display: flex; flex-direction: column; }
+  .navbar {
+    position: relative; z-index: 5; height: 75px; flex: 0 0 75px; display: flex; align-items: center; justify-content: space-between; padding: 0 30px;
+    background: var(--card-bg); border-top: 2px solid var(--accent-gold); border-radius: 25px 25px 0 0;
+  }
+  .nav-btn {
+    min-width: 160px; height: 48px; padding: 0 24px; border: none; border-radius: 99px; cursor: pointer; font-size: 15px; font-weight: 800; color: #fff;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: var(--bayang-kecil); transition: all .2s;
+  }
+  .nav-btn[disabled] { opacity: .3; cursor: not-allowed; }
+  .nav-back { background: #475569; }
+  .nav-next { background: linear-gradient(135deg, var(--accent-gold), #B45309); color: #FFF; }
+  .btn { border: none; border-radius: 99px; cursor: pointer; font-weight: 800; color: #fff; box-shadow: var(--bayang-kecil); transition: all .2s; }
+  .btn-gold { background: linear-gradient(135deg, var(--accent-gold), #B45309); color: #FFF; }
+  .btn-locked { opacity: 0.4; cursor: not-allowed !important; filter: grayscale(1); }
+
+  /* Beranda & Menu */
+  .judul-center { position: relative; z-index: 4; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 10px; padding: 20px; }
+  .pita { background: var(--accent-gold); color: #000; font-weight: 900; padding: 6px 20px; border-radius: 99px; font-size: 14px; letter-spacing: 2px; }
+  .judul-utama { color: var(--text-light); font-size: 40px; font-weight: 900; margin: 10px 0 0; text-transform: uppercase; }
+  .judul-sub { color: var(--accent-gold-light); font-size: 18px; font-weight: 700; max-width: 850px; font-style: italic; }
+  .mulai-btn { margin-top: 20px; height: 60px; padding: 0 45px; font-size: 20px; border: 2px solid var(--accent-gold-light); }
+  
+  .menu-cards { position: relative; z-index: 4; flex: 1; display: flex; gap: 16px; align-items: center; justify-content: center; padding: 10px 20px 20px; }
+  .menu-card {
+    width: 250px; height: 320px; border-radius: 24px; cursor: pointer; color: #fff;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+    box-shadow: var(--bayang-kecil); transition: all .3s; padding: 18px; text-align: center; border: 2px solid var(--garis); background: var(--card-bg);
+  }
+  .menu-card:hover { transform: translateY(-8px); border-color: var(--accent-gold); }
+  .menu-card.locked { border-color: #475569; opacity: 0.5; cursor: not-allowed; }
+  .menu-card.locked:hover { transform: none; border-color: #475569; }
+  .menu-card .img-ikon { font-size: 50px; }
+  .menu-card .mc-judul { font-size: 20px; font-weight: 900; color: var(--accent-gold-light); }
+  .menu-card .mc-sub { font-size: 12px; font-weight: 600; background: rgba(0,0,0,0.4); padding: 5px 10px; border-radius: 99px; color: var(--text-muted); }
+
+  /* Soal Layout */
+  .soal-split { display: flex; gap: 20px; flex: 1; min-height: 0; align-items: stretch; width: 100%; }
+  .soal-split .soal-kiri {
+    flex: 0 0 48%; max-width: 48%; background: var(--card-bg); border-radius: 20px; padding: 20px;
+    box-shadow: var(--bayang-kecil); border-left: 6px solid var(--accent-gold); overflow-y: auto; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--garis); border-right: 1px solid var(--garis); border-bottom: 1px solid var(--garis);
+  }
+  .soal-split .soal-kiri .soal-label { font-size: 12px; font-weight: 900; color: var(--accent-gold); letter-spacing: 2px; text-transform: uppercase; }
+  .soal-split .soal-kiri .soal-teks { font-size: 17px; font-weight: 800; color: var(--text-light); line-height: 1.4; }
+  .soal-split .soal-kiri .soal-stimulus { font-size: 14px; font-weight: 600; background: #0F172A; border-radius: 14px; padding: 12px 16px; border: 1px solid var(--garis); line-height:1.5; color: #E2E8F0; }
+  .soal-split .opsi-kanan { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; justify-content: center; background: var(--card-bg); padding: 20px; border-radius: 20px; border: 1px solid var(--garis); }
+  
+  .opsi { background: #0F172A; border: 2px solid var(--garis); border-radius: 14px; padding: 12px 16px; font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 12px; color: var(--text-light); transition: all .2s; }
+  .opsi:hover { border-color: var(--accent-gold); background: #334155; }
+  .opsi .bul { width: 32px; height: 32px; flex: 0 0 32px; border-radius: 50%; background: var(--card-bg); border: 1px solid var(--garis); display: flex; align-items: center; justify-content: center; font-weight: 900; color: var(--accent-gold-light); }
+  .opsi.benar { border-color: var(--hijau-tua); background: #064E3B; color: #A7F3D0; }
+  .opsi.salah { border-color: var(--salah); background: #7F1D1D; color: #FECACA; }
+
+  /* Interactive Elements */
+  .input-text-area { width: 100%; padding: 12px 16px; font-size: 16px; border: 2px solid var(--garis); border-radius: 12px; background: #0F172A; color: #fff; outline: none; }
+  .input-text-area:focus { border-color: var(--accent-gold); }
+  
+  .match-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+  .match-label { flex: 1; font-size: 14px; font-weight: 700; }
+  .match-select { flex: 1; padding: 8px; font-size: 14px; border-radius: 8px; background: #0F172A; color: #fff; border: 1px solid var(--garis); }
+
+  .drag-container { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+  .drag-item { background: #0F172A; border: 1px solid var(--accent-gold); color: var(--accent-gold-light); font-weight: 700; padding: 10px 14px; border-radius: 10px; font-size: 13px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .drag-btns { display: flex; gap: 4px; }
+  .mini-btn { background: #334155; border: 1px solid var(--accent-gold); color: #fff; border-radius: 6px; width: 28px; height: 28px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+  .mini-btn:hover { background: var(--accent-gold); color: #000; }
+
+  .feedback { border-radius: 14px; padding: 12px; font-size: 14px; font-weight: 700; display: none; text-align: center; margin-top: 10px; line-height: 1.4; }
+  .feedback.show { display: block; }
+  .feedback.ok { background: #064E3B; border: 2px solid var(--hijau-tua); color: #A7F3D0; }
+  .feedback.no { background: #7F1D1D; border: 2px solid var(--salah); color: #FECACA; }
+  
+  .clue-box { background: #451A03; border: 2px dashed var(--accent-gold); border-radius: 12px; padding: 10px 14px; margin-top: 10px; color: var(--accent-gold-light); font-weight: 800; font-size: 13px; }
+
+  /* Table Style untuk LKPD */
+  .lkpd-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
+  .lkpd-table th, .lkpd-table td { border: 1px solid var(--garis); padding: 6px 10px; text-align: center; }
+  .lkpd-table th { background: #0F172A; color: var(--accent-gold-light); }
+
+  /* Modal */
+  .modal-bg { position: absolute; inset: 0; z-index: 100; background: rgba(11, 19, 41, 0.92); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; }
+  .modal-bg.show { display: flex; }
+  .modal { width: 900px; max-width: 92%; max-height: 88%; overflow-y: auto; background: var(--card-bg); border-radius: 24px; padding: 30px; position: relative; border: 2px solid var(--accent-gold); box-shadow: var(--bayang-kecil); }
+  .modal h3 { margin: 0 0 14px; font-size: 24px; color: var(--accent-gold-light); font-weight: 900; }
+  .modal .tutup { position: absolute; top: 18px; right: 18px; width: 36px; height: 36px; border-radius: 50%; background: #0F172A; color: var(--salah); display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid var(--garis); font-size: 16px; font-weight: bold; }
+  .input-form { width: 100%; padding: 14px 18px; font-size: 16px; font-weight: 700; border: 2px solid var(--garis); border-radius: 14px; margin-bottom: 14px; outline: none; background: #0F172A; color: #fff; }
+  .input-form:focus { border-color: var(--accent-gold); }
+  .box-materi { background: #0F172A; border: 1px solid var(--garis); border-radius: 14px; padding: 16px; margin-bottom: 12px; line-height:1.5; }
+
+  .suspect-card { background: #0F172A; border: 2px solid var(--garis); border-radius: 16px; padding: 16px; cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+  .suspect-card:hover { border-color: var(--accent-gold); transform: translateX(5px); }
+  .suspect-card.selected { border-color: var(--accent-red); background: #450A0A; }
+
+  .akhir { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; }
+  .akhir h2 { font-size: 32px; color: var(--accent-gold-light); margin: 0; font-weight: 900; }
+  .akhir .skor-angka { font-size: 52px; font-weight: 900; color: var(--accent-gold); margin: 5px 0; }
+  .identitas { font-size: 18px; color: var(--text-muted); font-weight: 700; }
+</style>
+</head>
+<body>
+<div id="viewport">
+  <div id="stage">
+
+    <!-- BERANDA JUDUL -->
+    <section id="scr-judul" class="screen active">
+      <div class="bg"></div>
+      <div class="judul-center">
+        <div class="pita">🕵️‍♂️ TANGGO RAJO FILES</div>
+        <h1 class="judul-utama">Misteri Bunga Bank Pak Damaran</h1>
+        <p class="judul-sub">Pecahkan Manipulasi Rekening dengan Konsep Barisan &amp; Deret Aritmatika Bunga Tunggal!</p>
+        <button class="btn btn-gold mulai-btn" onclick="openModal('modal-login')">🔍 MULAI INVESTIGASI</button>
+      </div>
+    </section>
+
+    <!-- MENU UTAMA -->
+    <section id="scr-menu" class="screen">
+      <div class="bg"></div>
+      <div class="topbar">
+        <div class="judul-bar">Tanggo Rajo Files<small>Markas Detektif Loyang Dogan</small></div>
+        <div class="spacer"></div>
+        <button class="icon-btn" onclick="openModal('modal-clues')" title="Kantung Clue">💼 Clue</button>
+        <button class="icon-btn" onclick="goJudul()" title="Beranda" style="margin-left:8px;">⌂</button>
+      </div>
+      <div style="text-align:center; padding: 15px 20px 0;">
+        <h2 style="font-size:26px; margin:0; color:var(--accent-gold-light); font-weight:900;">Papan Kasus &amp; Modul Investigasi</h2>
+        <p style="color:var(--text-muted); margin-top:4px; font-size:14px;">Ikuti alur berurutan: Pelajari berkas, selesaikan Kotak Pemahaman, tuntaskan Uji Pemahaman, baru buka Sidang Tunjuk Pelaku!</p>
+      </div>
+      <div class="menu-cards">
+        <button class="menu-card" onclick="openModal('modal-persiapan')">
+          <div class="img-ikon">📜</div>
+          <div class="mc-judul">Berkas Kasus</div>
+          <div class="mc-sub">Materi, Latar Belakang &amp; Profil Terduga</div>
+        </button>
+        <button class="menu-card" onclick="startPemahaman()">
+          <div class="img-ikon">🧩</div>
+          <div class="mc-judul">Kotak Pemahaman</div>
+          <div class="mc-sub">Eksplorasi LKPD &amp; Kumpul Clue</div>
+        </button>
+        <button class="menu-card" onclick="startBerlatih()">
+          <div class="img-ikon">🕵️‍♂️</div>
+          <div class="mc-judul">Uji Pemahaman</div>
+          <div class="mc-sub">10 Soal Variasi &amp; Audit Mandiri</div>
+        </button>
+        <button class="menu-card locked" id="menu-card-vonis" onclick="klikMenuVonis()">
+          <div class="img-ikon">⚖</div>
+          <div class="mc-judul">Tunjuk Pelaku</div>
+          <div class="mc-sub" id="sub-vonis-teks">🔒 Terkunci (Selesaikan LKPD & Uji Soal)</div>
+        </button>
+      </div>
+    </section>
+
+    <!-- SCREEN 1: KOTAK PEMAHAMAN (LKPD & PENGUNGKAPAN CLUE KASUS) -->
+    <section id="scr-pemahaman" class="screen">
+      <div class="bg"></div>
+      <div class="topbar">
+        <div class="judul-bar">Kotak Pemahaman LKPD<small id="pemahaman-sub">Struktur Konstruksi Konsep Bunga Tunggal &amp; Audit Kasus</small></div>
+        <div class="spacer"></div>
+        <div class="skor-badge">🏆 Skor: <span id="skor-pemahaman-angka">0</span></div>
+        <div class="progress-wrap" style="margin-left:10px"><span class="progress-label" id="pemahaman-plabel">1/5</span><div class="progress-track"><div class="progress-fill" id="pemahaman-pfill"></div></div></div>
+        <button class="icon-btn" onclick="goMenu()" title="Menu">☰</button>
+      </div>
+      <div class="content" id="pemahaman-content"></div>
+      <div class="navbar">
+        <button class="nav-btn nav-back" onclick="pemahamanPrev()">◀ Sebelumnya</button>
+        <button class="nav-btn nav-next" id="pemahaman-next" onclick="pemahamanNext()" disabled>Selanjutnya ▶</button>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: UJI PEMAHAMAN KASUS (10 SOAL VARIASI) -->
+    <section id="scr-berlatih" class="screen">
+      <div class="bg"></div>
+      <div class="topbar">
+        <div class="judul-bar">Uji Pemahaman Kasus<small id="berlatih-sub">Audit Keuangan 10 Tipe Soal &amp; Pengujian Mandiri</small></div>
+        <div class="spacer"></div>
+        <div class="skor-badge">⭐ Audit: <span id="skor-berlatih-angka">0</span></div>
+        <div class="progress-wrap" style="margin-left:10px"><span class="progress-label" id="berlatih-plabel">1/10</span><div class="progress-track"><div class="progress-fill" id="berlatih-pfill"></div></div></div>
+        <button class="icon-btn" onclick="goMenu()" title="Menu">☰</button>
+      </div>
+      <div class="content" id="berlatih-content"></div>
+      <div class="navbar">
+        <button class="nav-btn nav-back" onclick="berlatihPrev()">◀ Sebelumnya</button>
+        <button class="nav-btn nav-next" id="berlatih-next" onclick="berlatihNext()" disabled>Selanjutnya ▶</button>
+      </div>
+    </section>
+
+    <!-- SCREEN 3: PENUNJUKAN PELAKU (VONIS) -->
+    <section id="scr-vonis" class="screen">
+      <div class="bg"></div>
+      <div class="topbar">
+        <div class="judul-bar">Sidang Puncak Tanggo Rajo<small>Penunjukan Pelaku Penyelewengan Rekening</small></div>
+        <div class="spacer"></div>
+        <button class="icon-btn" onclick="goMenu()" title="Menu">☰</button>
+      </div>
+      <div class="content" id="vonis-content"></div>
+    </section>
+
+    <!-- MODAL BERKAS MATERI LENGKAP -->
+    <div class="modal-bg" id="modal-persiapan">
+      <div class="modal">
+        <button class="tutup" onclick="closeModal('modal-persiapan')">✕</button>
+        <h3>📜 BERKAS BERKAS KASUS, MATERI &amp; PROFIL TERDUGA</h3>
+
+        <!-- SEKSI 1: TUJUAN PEMBELAJARAN -->
+        <div class="box-materi" style="border-left: 5px solid var(--accent-gold-light);">
+          <h4 style="color:var(--accent-gold-light); margin-top:0;">🎯 TUJUAN PEMBELAJARAN</h4>
+          <p>Setelah menginvestigasi kasus ini, Detektif Siswa diharapkan dapat:</p>
+          <ul>
+            <li><b>Menganalisis Pola Aritmatika:</b> Mengidentifikasi suku pertama ($a$), beda ($b$), dan suku ke-$n$ ($U_n$) dalam konteks transaksi keuangan nyata.</li>
+            <li><b>Memahami Bunga Tunggal:</b> Menghitung pertambahan nominal bunga yang konstan/tetap pada tabungan maupun pinjaman.</li>
+            <li><b>Memecahkan Masalah Kontekstual:</b> Menerapkan rumus $U_n = M_0 + (n \times b)$ untuk mendeteksi penyelewengan dana pinjaman/tabungan.</li>
+            <li><b>Berpikir Kritis &amp; Analitis:</b> Mengumpulkan bukti (clue) secara ilmiah melalui audit matematis guna menarik kesimpulan hukum yang tepat.</li>
+          </ul>
+        </div>
+
+        <!-- SEKSI 2: LATAR BELAKANG KASUS -->
+        <div class="box-materi" style="border-left: 5px solid #38BDF8;">
+          <h4 style="color:#38BDF8; margin-top:0;">📁 LATAR BELAKANG KASUS</h4>
+          <p><b>Lokasi Kasus:</b> Dermaga Tanggo Rajo, Kabupaten Tebo.</p>
+          <p>Pak Damaran, seorang pedagang kuliner lokal di kawasan Dermaga Tanggo Rajo, mengajukan pinjaman modal usaha sebesar <b>Rp10.000.000,00</b> dengan kesepakatan <b>Bunga Tunggal 2% per bulan</b> di Bank Dermaga Tanggo Rajo.</p>
+          <p>Namun, saat memasuki bulan ke-3 dan seterusnya, slip tagihan cetak menunjukkan angka pembengkakan tagihan yang tidak wajar. Istri Pak Damaran yang mendampingi suaminya mengurus keuangan keluarga merasa curiga karena uang setoran bulanan kian membengkak, sementara sang suami awalnya dikira keliru menghitung cicilan. Setelah dilakukan pengecekan awal, diduga kuat ada oknum dalam bank yang sengaja memanipulasi perhitungan Beda Bunga ($b$) untuk mengantongi selisih dana secara ilegal. Anda diutus sebagai <b>Detektif Loyang Dogan</b> untuk membongkar manipulasi ini melalui audit matematis!</p>
+        </div>
+
+        <!-- SEKSI 3: PROFIL TERDUGA PELAKU PENYELEWEWENGAN -->
+        <div class="box-materi" style="border-left: 5px solid var(--accent-red);">
+          <h4 style="color:var(--accent-red); margin-top:0;">🕵️‍♂️ PROFIL TERDUGA (NAMA DAN JABATAN)</h4>
+          <p>Berdasarkan laporan awal dari keluarga (Pak Damaran dan istrinya) serta pihak bank, berikut adalah pihak-pihak yang masuk dalam radar investigasi:</p>
+          <ul>
+            <li><b>1. Pak Damaran &amp; Istri</b>[cite: 3]
+              <br>• <i>Jabatan:</i> Pemilik Usaha Kuliner &amp; Keluarga Pendamping[cite: 3]
+            </li>
+            <li><b>2. Budi</b>[cite: 3]
+              <br>• <i>Jabatan:</i> Karyawan Operasional Harian (Kasir Warung Kuliner)[cite: 3]
+            </li>
+            <li><b>3. Pak Arya</b>[cite: 3]
+              <br>• <i>Jabatan:</i> Staf Administrasi / Pengelola Keuangan &amp; Teller Utama Bank Tanggo Rajo[cite: 3]
+            </li>
+          </ul>
+        </div>
+
+        <!-- SEKSI 4: PANDUAN BERMAIN -->
+        <div class="box-materi" style="border-left: 5px solid #10B981;">
+          <h4 style="color:#10B981; margin-top:0;">🎮 PANDUAN BERMAIN &amp; SISTEM KUNCI BERURUTAN</h4>
+          <ol style="padding-left:20px; line-height:1.6;">
+            <li><b>Langkah 1 (Pelajari Berkas):</b> Pahami latar belakang kasus, profil terduga, dan materi barisan aritmatika.</li>
+            <li><b>Langkah 2 (Kotak Pemahaman / LKPD):</b> Selesaikan seluruh 5 pos soal secara berurutan untuk merekonstruksi konsep dan mengumpulkan clue.</li>
+            <li><b>Langkah 3 (Uji Pemahaman Kasus):</b> Selesaikan seluruh 10 soal audit keuangan lanjutan secara tuntas. Menu Sidang Vonis terkunci sampai tahap ini selesai!</li>
+            <li><b>Langkah 4 (Tunjuk Pelaku / Sidang Puncak):</b> Setelah semua tuntas, kunci terbuka otomatis dan Anda dapat mengeksekusi penunjukan pelaku!</li>
+          </ol>
+        </div>
+        
+        <!-- SEKSI 5: MATERI BARISAN & DERET ARITMATIKA -->
+        <div class="box-materi" style="border-left: 5px solid var(--accent-gold);">
+          <h4 style="color:var(--accent-gold-light); margin-top:0;">📐 1. MATERI BARISAN DAN DERET ARITMATIKA</h4>
+          <p><b>Barisan Aritmatika</b> adalah susunan bilangan yang memiliki selisih/beda yang konstan antar suku berurutan.</p>
+          <ul>
+            <li><b>Suku Pertama ($a$):</b> Nilai awal susunan barisan ($U_1$).</li>
+            <li><b>Beda ($b$):</b> Selisih konstan antar suku yang berurutan ($b = U_n - U_{n-1}$).</li>
+            <li><b>Rumus Suku ke-$n$ ($U_n$):</b> Digunakan untuk mencari nilai suku pada urutan tertentu:
+              $$U_n = a + (n - 1)b$$
+            </li>
+            <li><b>Jumlah $n$ Suku Pertama ($S_n$ / Deret Aritmatika):</b>
+              $$S_n = \frac{n}{2} (2a + (n - 1)b) \quad \text{atau} \quad S_n = \frac{n}{2} (a + U_n)$$
+            </li>
+          </ul>
+        </div>
+
+        <!-- SEKSI 6: MATERI APLIKASI BUNGA TUNGGAL -->
+        <div class="box-materi" style="border-left: 5px solid var(--accent-gold);">
+          <h4 style="color:var(--accent-gold-light); margin-top:0;">💰 2. MATERI APLIKASI PADA BUNGA TUNGGAL</h4>
+          <p><b>Bunga Tunggal</b> adalah sistem jasa simpanan atau pinjaman di mana nominal bunga dihitung <b>selalu tetap</b> berdasarkan Modal Awal ($M_0$) yang tidak berubah.</p>
+          <ul>
+            <li><b>Modal Awal ($M_0$):</b> Modal awal yang dipinjam ($a = M_0$).</li>
+            <li><b>Nominal Bunga per Periode ($b$):</b> $b = M_0 \times i$.</li>
+            <li><b>Total Saldo / Utang Periode ke-$n$ ($U_n$):</b> $U_n = M_0 + (n \times b)$.</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- MODAL KANTUNG CLUE -->
+    <div class="modal-bg" id="modal-clues">
+      <div class="modal" style="width: 650px;">
+        <button class="tutup" onclick="closeModal('modal-clues')">✕</button>
+        <h3>💼 Kantung Clue Detektif Loyang Dogan</h3>
+        <p style="color:var(--text-muted);">Clue yang berhasil dikumpulkan dari penyelesaian Kotak Pemahaman (LKPD):</p>
+        <div id="daftar-clues-list" style="display:flex; flex-direction:column; gap:10px; margin-top:15px;"></div>
+      </div>
+    </div>
+
+    <!-- MODAL LOGIN -->
+    <div class="modal-bg" id="modal-login">
+      <div class="modal" style="width: 520px; text-align: center; padding: 35px;">
+        <button class="tutup" onclick="closeModal('modal-login')">✕</button>
+        <h3>Identitas Detektif Siswa</h3>
+        <p style="margin-bottom:20px; color:var(--text-muted);">Isi identitas Anda untuk membuka akses Papan Kasus Tanggo Rajo!</p>
+        <input type="text" id="in-nama" class="input-form" placeholder="Nama Lengkap Detektif" required>
+        <input type="text" id="in-sekolah" class="input-form" placeholder="Kelas / Rombel (Misal: XI AKL 1)">
+        <button class="btn btn-gold" style="width:100%; height:55px; font-size:18px; margin-top:10px;" onclick="simpanIdentitas()">Buka Papan Kasus</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzqRGBFk4GZxHNwHZlXU0kuYWQH4AXnnlKZYsldM5sFR3RrkvtHmTsFKYLY0JsYYLT6qQ/exec";
+
+/* DATA KOTAK PEMAHAMAN (LKPD & PENGUNGKAPAN 5 CLUE UTAMA KASUS) */
+const KOTAK_PEMAHAMAN = [
+  {
+    pos: 1,
+    sub: "POS LKPD 1: Menghitung Bunga Tetap per Bulan",
+    stimulus: "Pak Damaran meminjam modal awal usaha sebesar <b>Rp10.000.000,00</b> dengan sistem <b>Bunga Tunggal 2% per bulan</b> di Bank Dermaga Tanggo Rajo.",
+    soal: "Hitunglah nominal Bunga Tetap per Bulan ($b$) yang seharusnya dibayarkan Pak Damaran secara matematis!",
+    opsi: [
+      "b = Rp200.000,00 per bulan",
+      "b = Rp20.000,00 per bulan",
+      "b = Rp2.000.000,00 per bulan"
+    ],
+    j: 0,
+    msg: "Tepat! $\\text{Bunga} = 2\\% \\times \\text{Rp}10.000.000,00 = \\text{Rp}200.000,00$.",
+    clue: "CLUE 1: Perhitungan matematis dasar membuktikan bunga normal per bulan adalah Rp200.000,00 (tetap)."
+  },
+  {
+    pos: 2,
+    sub: "POS LKPD 2: Pola Tabel Pengembalian Bulan ke-n ($U_n$)",
+    stimulus: "Perhatikan struktur tabel pengembalian (Modal + Bunga):<br><table class='lkpd-table'><tr><th>Bulan (n)</th><th>Pola Un</th><th>Total Tagihan</th></tr><tr><td>1 (U1)</td><td>10.000.000 + (1 x 200.000)</td><td>Rp10.200.000</td></tr><tr><td>2 (U2)</td><td>10.000.000 + (2 x 200.000)</td><td>Rp10.400.000</td></tr><tr><td>3 (U3)</td><td>10.000.000 + (3 x 200.000)</td><td>? (Slip tercatat Rp10.700.000)</td></tr></table>",
+    soal: "Berdasarkan pola barisan aritmatika, berapakah seharusnya total kewajiban pengembalian pada Bulan ke-3 ($U_3$), dan apakah ada pembengkakan dari slip tercatat?",
+    opsi: [
+      "Seharusnya U3 = Rp10.600.000,00, terbukti ada pembengkakan tak wajar pada slip senilai Rp100.000,00",
+      "Seharusnya U3 = Rp10.800.000,00, slip sudah sesuai aturan bank",
+      "Tidak ada pola aritmatika pada tagihan bulan ke-3"
+    ],
+    j: 0,
+    msg: "Benar! Secara teori aritmatika $U_3 = \\text{Rp}10.600.000,00$, sehingga tagihan Rp10.700.000,00 pada slip adalah pembengkakan tak wajar.",
+    clue: "CLUE 2: Audit slip bulan ke-3 menunjukkan lonjakan tagihan yang menyimpang dari rumus barisan aritmatika."
+  },
+  {
+    pos: 3,
+    sub: "POS LKPD 3: Mengidentifikasi Komponen $a$ dan $b$",
+    stimulus: "Berdasarkan susunan suku-suku pengembalian normal: Rp10.200.000, Rp10.400.000, Rp10.600.000, ...",
+    soal: "Tentukan nilai Suku Pertama ($a = U_1$) dan Beda ($b$) untuk mengonfirmasi konsistensi cicilan yang dibayarkan suami-istri Damaran!",
+    opsi: [
+      "a = Rp10.200.000,00 dan b = Rp200.000,00 (Konsisten)",
+      "a = Rp10.000.000,00 dan b = Rp10.200.000,00",
+      "a = Rp200.000,00 dan b = Rp10.000.000,00"
+    ],
+    j: 0,
+    msg: "Sangat akurat! $a = \\text{Rp}10.200.000,00$ dan beda konstan $b = \\text{Rp}200.000,00$ membuktikan catatan keluarga Damaran benar.",
+    clue: "CLUE 3: Catatan pembukuan mandiri keluarga Damaran terbukti konsisten dan bersih dari kesalahan hitung."
+  },
+  {
+    pos: 4,
+    sub: "POS LKPD 4: Pemetaan Konsep & Indikasi Oknum",
+    stimulus: "Detektif menganalisis alur transaksi dari suami ke kasir warung (Budi) lalu disetorkan ke bank:",
+    soal: "Manakah kesimpulan logis yang paling tepat untuk mendeteksi siapa pihak yang memanipulasi tagihan?",
+    opsi: [
+      "Suami-istri Damaran adalah korban pembengkakan, Budi hanya kurir tunai, maka manipulasi pasti terjadi di meja pelayanan bank",
+      "Suami peminjam yang salah menghitung cicilan sendiri sejak awal",
+      "Kasir Budi yang menggelapkan dana warung"
+    ],
+    j: 0,
+    msg: "Tepat! Secara logika suami-istri dan kasir Budi tidak memiliki akses mengubah sistem cetak tagihan bank.",
+    clue: "CLUE 4: Penyelidikan lapangan mengonfirmasi bahwa manipulasi terjadi di dalam sistem internal bank, bukan dari pihak keluarga."
+  },
+  {
+    pos: 5,
+    sub: "POS LKPD 5: Verifikasi Ciri Jabatan & Otoritas Loket Bank",
+    stimulus: "Berdasarkan audit operasional loket, ditemukan bahwa pencetakan slip selisih bunga bulanan hanya dapat dilakukan oleh pegawai dengan otoritas jabatan pengelolaan keuangan dan pencatatan transaksi.",
+    soal: "Berdasarkan otoritas kerja di atas, siapakah posisi oknum internal yang memegang kendali penuh di loket tersebut?",
+    opsi: [
+      "Staf Administrasi & Teller Utama (Pengelola Keuangan di Bank)",
+      "Customer Service baru bagian informasi umum",
+      "Kurir pembawa uang tunai lapangan"
+    ],
+    j: 0,
+    msg: "Hebat! Tugas dan jabatan tersebut merujuk langsung pada profil petugas loket utama.",
+    clue: "CLUE 5 (FINAL): Petugas loket/pengelola keuangan berotoritas di bank terbukti sah sebagai pemegang kendali manipulasi!"
+  }
+];
+
+/* DATA 10 SOAL UJI PEMAHAMAN LANJUTAN */
+const UJI_PEMAHAMAN = [
+  {
+    tipe: "uraian",
+    stimulus: "Pak Damaran menabung Rp4.000.000,00 di Bank Tanggo Rajo dengan bunga tunggal 5% per tahun. Hitunglah total bunga yang didapatkan Pak Damaran setelah 2 tahun!",
+    soal: "Tuliskan hasil akhir nominal bunganya saja dalam angka (Contoh: 400000):",
+    kunci: "400000",
+    msg: "Bunga $= 4.000.000 \\times 5\\% \\times 2 = \\text{Rp}400.000,00$."
+  },
+  {
+    tipe: "titik",
+    stimulus: "Lengkapi kalimat berikut: Dalam sistem Bunga Tunggal, nilai penambahan bunga setiap periode selalu [.....] karena dihitung dari Modal Awal yang sama.",
+    soal: "Pilih kata yang paling tepat untuk mengisi titik-titik di atas:",
+    opsi: ["TETAP / KONSTAN", "BERUBAH-UBAH", "MENGECIL"],
+    j: 0,
+    msg: "Tepat! Bunga tunggal menghasilkan penambahan konstan."
+  },
+  {
+    tipe: "jodohkan",
+    stimulus: "Jodohkan istilah Barisan Aritmetika berikut dengan padanannya dalam konsep Bunga Tunggal:",
+    soal: "Pilih pasangan yang sesuai untuk setiap istilah di bawah:",
+    pasangan: [
+      { p: "Suku Pertama (a)", q: "Modal Awal + Bunga Bulan 1" },
+      { p: "Beda (b)", q: "Nominal Bunga per Bulan" },
+      { p: "Suku ke-n (Un)", q: "Total Saldo Bulan ke-n" }
+    ],
+    msg: "Semua pasangan variabel tepat dan sesuai!"
+  },
+  {
+    tipe: "dragdrop",
+    stimulus: "Susun urutan langkah menghitung Total Saldo Bulan ke-n ($U_n$) pada bunga tunggal secara runtut!",
+    soal: "Urutkan langkah berikut dari atas ke bawah menggunakan tombol panah naik/turun:",
+    items: [
+      "1. Hitung nominal bunga per bulan (b = M0 x i)",
+      "2. Kalikan nominal bunga dengan periode bulan (n x b)",
+      "3. Jumlahkan Modal Awal dengan total bunga (M0 + n.b)"
+    ],
+    kunciUrutan: [
+      "1. Hitung nominal bunga per bulan (b = M0 x i)",
+      "2. Kalikan nominal bunga dengan periode bulan (n x b)",
+      "3. Jumlahkan Modal Awal dengan total bunga (M0 + n.b)"
+    ],
+    msg: "Urutan algoritma perhitungan saldo sangat sistematis!"
+  },
+  {
+    tipe: "uraian",
+    stimulus: "Pinjaman modal kuliner sebesar Rp6.000.000,00 dikenakan bunga tunggal 1% per bulan. Jika Pak Damaran meminjam selama 10 bulan, berapa total uang yang harus dikembalikan?",
+    soal: "Ketik nominal total pengembalian (Contoh: 6600000):",
+    kunci: "6600000",
+    msg: "Total $= 6.000.000 + (10 \\times 60.000) = \\text{Rp}6.600.000,00$."
+  },
+  {
+    tipe: "titik",
+    stimulus: "Jika Modal Awal $M_0 = \\text{Rp}5.000.000,00$ dan Beda Bunga $b = \\text{Rp}100.000,00$, maka rumusan Suku ke-$n$ tabungan adalah $U_n = 5.000.000 + [.....]$.",
+    soal: "Isian yang benar untuk bagian dalam kurung siku adalah:",
+    opsi: ["n x 100.000", "n + 100.000", "100.000 / n"],
+    j: 0,
+    msg: "Rumusan matematika $U_n = M_0 + (n \\times b)$ benar!"
+  },
+  {
+    tipe: "jodohkan",
+    stimulus: "Jodohkan persentase bunga bulanan dari Modal $M_0 = \\text{Rp}2.000.000,00$ dengan nilai Beda ($b$) nominalnya:",
+    soal: "Hubungkan suku bunga dengan nominal bunga bulanan:",
+    pasangan: [
+      { p: "Suku Bunga 1%", q: "Rp20.000,00" },
+      { p: "Suku Bunga 2%", q: "Rp40.000,00" },
+      { p: "Suku Bunga 2,5%", q: "Rp50.000,00" }
+    ],
+    msg: "Penghitungan Beda nominal dari persentase akurat!"
+  },
+  {
+    tipe: "dragdrop",
+    stimulus: "Klasifikasikan karakteristik berikut ke dalam kelompok Bunga Tunggal:",
+    soal: "Konfirmasi karakteristik Bunga Tunggal berikut:",
+    items: [
+      "Bunga selalu dihitung dari modal awal",
+      "Termasuk aplikasi Barisan Aritmetika",
+      "Nominal pertambahan bunga bersifat konstan"
+    ],
+    kunciUrutan: [
+      "Bunga selalu dihitung dari modal awal",
+      "Termasuk aplikasi Barisan Aritmetika",
+      "Nominal pertambahan bunga bersifat konstan"
+    ],
+    msg: "Karakteristik Bunga Tunggal teridentifikasi sempurna!"
+  },
+  {
+    tipe: "uraian",
+    stimulus: "Tabungan Pak Damaran berkembang dari Rp3.000.000,00 menjadi Rp3.360.000,00 dalam waktu 6 bulan dengan bunga tunggal.",
+    soal: "Berapakah besar nominal bunga per bulan ($b$)? (Contoh: 60000):",
+    kunci: "60000",
+    msg: "Total bunga $= 360.000$. Bunga per bulan $= 360.000 / 6 = \\text{Rp}60.000,00$."
+  },
+  {
+    tipe: "titik",
+    stimulus: "Seorang oknum teller memotong bunga Pak Damaran sebesar Rp25.000 setiap bulan. Dalam 1 tahun, total dana yang diselewengkan adalah [.....].",
+    soal: "Total penyelewengan dana dalam 12 bulan:",
+    opsi: ["Rp300.000,00", "Rp250.000,00", "Rp350.000,00"],
+    j: 0,
+    msg: "Perhitungan kerugian $= 12 \\times 25.000 = \\text{Rp}300.000,00$."
+  }
+];
+
+/* DATA TERSANGKA PELAKU */
+const TERSANGKA = [
+  {
+    nama: "Pak Damaran & Istri (Pihak Peminjam / Korban)",
+    jabatan: "Pemilik Usaha Kuliner & Keluarga Pendamping",
+    alibi: "Melaporkan kejanggalan tagihan setelah mencocokkan slip cicilan dengan perhitungan manual. Secara logika rumah tangga, suami-istri adalah pihak yang dirugikan secara finansial, bukan pelaku.",
+    isPelaku: false
+  },
+  {
+    nama: "Budi (Kasir Warung Kuliner)",
+    jabatan: "Karyawan Operasional Harian",
+    alibi: "Hanya dipercaya membawa titipan uang tunai setoran ke bank tanpa memiliki akses ke komputer teller atau sistem pencetakan slip pusat.",
+    isPelaku: false
+  },
+  {
+    nama: "Pak Arya",
+    jabatan: "Staf Administrasi / Pengelola Keuangan & Teller Utama Bank Tanggo Rajo",
+    alibi: "Memiliki otoritas penuh di loket perbankan dan terbukti memanipulasi variabel beda bunga ($b$) sejak bulan ke-3 ke atas.",
+    isPelaku: true
+  }
+];
+
+/* SISTEM STATUS PROGRESS DAN KUNCI */
+let infoMurid = { nama: "Detektif", kelas: "-" };
+let skorPemahaman = 0, pem = { step: 0, state: [] };
+let latih = { step: 0, skor: 0, state: [] };
+let cluesCollected = [];
+let currentDragItems = [];
+
+// Status Kunci Berurutan
+let gameProgress = {
+  pemahamanSelesai: false,
+  berlatihSelesai: false
+};
+
+const stage = document.getElementById('stage');
+function resizeStage(){
+  const w = window.innerWidth, h = window.innerHeight;
+  const scale = Math.min(w/1280, h/720);
+  stage.style.transform = 'scale(' + scale + ')';
+  stage.style.left = ((w - 1280*scale)/2) + 'px'; stage.style.top = ((h - 720*scale)/2) + 'px';
+}
+window.addEventListener('resize', resizeStage); resizeStage();
+
+function simpanIdentitas(){
+  const nm = document.getElementById('in-nama').value.trim();
+  const sk = document.getElementById('in-sekolah').value.trim();
+  if(!nm){ alert("Nama Detektif wajib diisi!"); return; }
+  infoMurid.nama = nm; infoMurid.kelas = sk || "-";
+  closeModal('modal-login'); goMenu();
+}
+
+function openModal(id){ 
+  document.getElementById(id).classList.add('show'); 
+  if(id==='modal-clues') renderCluesModal();
+  if(window.MathJax) MathJax.typesetPromise(); 
+}
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+function setProgress(fillId, labelId, cur, total){ document.getElementById(fillId).style.width=(cur/total*100)+'%'; document.getElementById(labelId).textContent=cur+'/'+total; }
+function showFb(id,kind,msg){ const fb=document.getElementById(id); fb.className='feedback show '+kind; fb.innerHTML=msg; }
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  resizeStage();
+}
+function goJudul(){ showScreen('scr-judul'); }
+function goMenu(){ 
+  updateMenuLocks();
+  showScreen('scr-menu'); 
+}
+
+function updateMenuLocks(){
+  const vonisCard = document.getElementById('menu-card-vonis');
+  const subVonis = document.getElementById('sub-vonis-teks');
+  if(gameProgress.pemahamanSelesai && gameProgress.berlatihSelesai){
+    vonisCard.classList.remove('locked');
+    subVonis.textContent = "🔓 Terbuka! Eksekusi Vonis Kasus";
+  } else {
+    vonisCard.classList.add('locked');
+    subVonis.textContent = "🔒 Terkunci (Selesaikan LKPD & Uji Soal)";
+  }
+}
+
+function klikMenuVonis(){
+  if(!gameProgress.pemahamanSelesai || !gameProgress.berlatihSelesai){
+    alert("🔒 MENU TERKUNCI!\nAnda harus menyelesaikan seluruh 'Kotak Pemahaman (LKPD)' DAN menuntaskan 10 soal di 'Uji Pemahaman' terlebih dahulu sebelum dapat melakukan penunjukan pelaku.");
+    return;
+  }
+  startVonis();
+}
+
+function renderCluesModal(){
+  const list = document.getElementById('daftar-clues-list');
+  if(cluesCollected.length === 0){
+    list.innerHTML = `<div style="color:var(--text-muted); text-align:center; padding:20px;">Belum ada clue yang dikumpulkan. Selesaikan pos-pos di Kotak Pemahaman (LKPD)!</div>`;
+    return;
+  }
+  let html = '';
+  cluesCollected.forEach((c, i) => {
+    html += `<div class="clue-box">🔍 <b>Bukti ${i+1}:</b> ${c}</div>`;
+  });
+  list.innerHTML = html;
+}
+
+/* KOTAK PEMAHAMAN (LKPD & PENGUMPULAN CLUE) */
+function startPemahaman(){ 
+  pem={step:0, state:[]}; 
+  KOTAK_PEMAHAMAN.forEach((_,i)=>pem.state[i]={done:false}); 
+  skorPemahaman=0; document.getElementById('skor-pemahaman-angka').textContent=0;
+  showScreen('scr-pemahaman'); renderPemahaman(); 
+}
+function pemahamanNext(){ if(pem.step < KOTAK_PEMAHAMAN.length-1){ pem.step++; renderPemahaman(); } else renderSelesaiPemahaman(); }
+function pemahamanPrev(){ if(pem.step > 0){ pem.step--; renderPemahaman(); } else goMenu(); }
+
+function renderPemahaman(){
+  setProgress('pemahaman-pfill','pemahaman-plabel', pem.step+1, KOTAK_PEMAHAMAN.length);
+  document.getElementById('pemahaman-next').disabled = !pem.state[pem.step].done;
+  const pos = KOTAK_PEMAHAMAN[pem.step];
+  document.getElementById('pemahaman-sub').textContent = pos.sub;
+  
+  const c = document.getElementById('pemahaman-content');
+  let opsiHTML = '';
+  pos.opsi.forEach((o, i) => {
+    opsiHTML += `<div class="opsi" onclick="cekKotakPemahaman(${i})"><div class="bul">${String.fromCharCode(65+i)}</div><span>${o}</span></div>`;
+  });
+  c.innerHTML = `
+    <div class="soal-split">
+      <div class="soal-kiri">
+        <div class="soal-label">Kotak Pemahaman ${pem.step+1} / 5</div>
+        <div class="soal-stimulus">${pos.stimulus}</div>
+        <div class="soal-teks">${pos.soal}</div>
+      </div>
+      <div class="opsi-kanan">
+        <div class="opsi-list">${opsiHTML}</div>
+        <div class="feedback" id="pemahaman-fb"></div>
+        <div id="pemahaman-clue-box"></div>
+      </div>
+    </div>`;
+  if(window.MathJax) MathJax.typesetPromise();
+}
+
+function cekKotakPemahaman(idx){
+  if(pem.state[pem.step].done) return;
+  const pos = KOTAK_PEMAHAMAN[pem.step];
+  const list = document.querySelectorAll('#pemahaman-content .opsi');
+  list.forEach(el => el.style.pointerEvents = 'none');
+  
+  if(idx === pos.j){
+    skorPemahaman += 20; document.getElementById('skor-pemahaman-angka').textContent = skorPemahaman;
+    list[idx].classList.add('benar'); 
+    showFb('pemahaman-fb', 'ok', `✅ <b>Analisis Kasus Tepat! (+20 Skor)</b><br>${pos.msg}`);
+    if(!cluesCollected.includes(pos.clue)) cluesCollected.push(pos.clue);
+    document.getElementById('pemahaman-clue-box').innerHTML = `<div class="clue-box">💼 <b>CLUE DITEMUKAN:</b> ${pos.clue}</div>`;
+  } else {
+    list[idx].classList.add('salah'); list[pos.j].classList.add('benar');
+    showFb('pemahaman-fb', 'no', `❌ <b>Analisis Kurang Tepat!</b><br>${pos.msg}`);
+  }
+  pem.state[pem.step].done = true; document.getElementById('pemahaman-next').disabled = false;
+  if(window.MathJax) MathJax.typesetPromise();
+}
+
+function renderSelesaiPemahaman(){
+  gameProgress.pemahamanSelesai = true;
+  document.getElementById('pemahaman-sub').textContent='Kotak Pemahaman & Clue Selesai';
+  document.getElementById('pemahaman-next').disabled=true;
+  document.getElementById('pemahaman-content').innerHTML=`
+    <div class="akhir">
+      <h2>🎉 SELURUH CLUE KASUS TERKUMPUL!</h2>
+      <div class="identitas">${infoMurid.nama} • ${infoMurid.kelas}</div>
+      <p style="font-size:18px;margin-top:10px;color:var(--accent-gold-light);">LKPD selesai! Silakan lanjutkan ke <b>Uji Pemahaman</b> untuk menuntaskan 10 soal berikutnya.</p>
+      <div style="display:flex; gap:12px; margin-top:15px;">
+        <button class="btn btn-gold" style="height:50px;padding:0 25px;font-size:16px;" onclick="startBerlatih()">🕵️‍♂️ Lanjut ke Uji Pemahaman (10 Soal) ▶</button>
+        <button class="btn btn-gold" style="height:50px;padding:0 20px;font-size:15px; background:#475569;" onclick="goMenu()">☰ Kembali ke Menu Utama</button>
+      </div>
+    </div>`;
+}
+
+/* UJI PEMAHAMAN (10 SOAL VARIASI) */
+function startBerlatih(){ 
+  latih={step:0,skor:0,state:[]}; 
+  UJI_PEMAHAMAN.forEach((_,i)=>latih.state[i]={done:false}); 
+  document.getElementById('skor-berlatih-angka').textContent = 0;
+  showScreen('scr-berlatih'); renderBerlatih(); 
+}
+function berlatihNext(){ if(latih.step < UJI_PEMAHAMAN.length - 1){ latih.step++; renderBerlatih(); } else renderSkorLatih(); }
+function berlatihPrev(){ if(latih.step > 0){ latih.step--; renderBerlatih(); } else goMenu(); }
+
+function renderBerlatih(){
+  setProgress('berlatih-pfill','berlatih-plabel', latih.step+1, UJI_PEMAHAMAN.length);
+  document.getElementById('berlatih-next').disabled=!latih.state[latih.step].done;
+  const q = UJI_PEMAHAMAN[latih.step], c = document.getElementById('berlatih-content');
+  
+  let kananHTML = '';
+  
+  if(q.tipe === "uraian"){
+    kananHTML = `
+      <p style="font-weight:bold; color:var(--accent-gold-light); margin-top:0;">[Tipe: Uraian Singkat]</p>
+      <input type="text" id="ans-uraian" class="input-text-area" placeholder="Masukkan angka jawaban...">
+      <button class="btn btn-gold" style="width:100%; height:45px; margin-top:10px;" onclick="jawabUraian()">Kirim Jawaban Uraian</button>`;
+  } else if(q.tipe === "titik"){
+    let opsiHTML = '';
+    q.opsi.forEach((o, i) => {
+      opsiHTML += `<div class="opsi" onclick="jawabTitik(${i})"><div class="bul">${String.fromCharCode(65+i)}</div><span>${o}</span></div>`;
+    });
+    kananHTML = `<p style="font-weight:bold; color:var(--accent-gold-light); margin-top:0;">[Tipe: Melengkapi Titik-Titik]</p><div class="opsi-list">${opsiHTML}</div>`;
+  } else if(q.tipe === "jodohkan"){
+    let rowsHTML = '';
+    q.pasangan.forEach((p, i) => {
+      rowsHTML += `
+        <div class="match-row">
+          <div class="match-label">${p.p}</div>
+          <select class="match-select" id="match-sel-${i}">
+            <option value="">-- Pilih Pasangan --</option>
+            ${q.pasangan.map((item, idx) => `<option value="${idx}">${item.q}</option>`).join('')}
+          </select>
+        </div>`;
+    });
+    kananHTML = `
+      <p style="font-weight:bold; color:var(--accent-gold-light); margin-top:0;">[Tipe: Menjodohkan]</p>
+      ${rowsHTML}
+      <button class="btn btn-gold" style="width:100%; height:45px; margin-top:10px;" onclick="jawabJodohkan()">Periksa Pasangan</button>`;
+  } else if(q.tipe === "dragdrop"){
+    currentDragItems = [...q.items];
+    kananHTML = `
+      <p style="font-weight:bold; color:var(--accent-gold-light); margin-top:0;">[Tipe: Urutan Runtut]</p>
+      <p style="font-size:13px; color:var(--text-muted);">Gunakan tombol panah <b>↑ / ↓</b> untuk menyusun urutan langkah secara benar:</p>
+      <div class="drag-container" id="drag-list-box"></div>
+      <button class="btn btn-gold" style="width:100%; height:45px; margin-top:10px;" onclick="jawabDragDrop()">Konfirmasi Urutan</button>`;
+  }
+
+  c.innerHTML = `
+    <div class="soal-split">
+      <div class="soal-kiri">
+        <div class="soal-label">Audit Soal ${latih.step+1} / 10</div>
+        <div class="soal-stimulus">${q.stimulus}</div>
+        <div class="soal-teks">${q.soal}</div>
+      </div>
+      <div class="opsi-kanan">
+        ${kananHTML}
+        <div class="feedback" id="bl-fb"></div>
+      </div>
+    </div>`;
+
+  if(q.tipe === "dragdrop"){
+    renderDragList();
+  }
+  if(window.MathJax) MathJax.typesetPromise();
+}
+
+function renderDragList(){
+  const box = document.getElementById('drag-list-box');
+  if(!box) return;
+  let html = '';
+  currentDragItems.forEach((item, idx) => {
+    html += `
+      <div class="drag-item">
+        <span>${item}</span>
+        <div class="drag-btns">
+          <button class="mini-btn" onclick="pindahItem(${idx}, -1)" title="Geser ke Atas">↑</button>
+          <button class="mini-btn" onclick="pindahItem(${idx}, 1)" title="Geser ke Bawah">↓</button>
+        </div>
+      </div>`;
+  });
+  box.innerHTML = html;
+}
+
+function pindahItem(index, arah){
+  if(latih.state[latih.step].done) return;
+  const target = index + arah;
+  if(target < 0 || target >= currentDragItems.length) return;
+  const temp = currentDragItems[index];
+  currentDragItems[index] = currentDragItems[target];
+  currentDragItems[target] = temp;
+  renderDragList();
+}
+
+/* LOGIK JAWABAN UJI PEMAHAMAN */
+function jawabUraian(){
+  if(latih.state[latih.step].done) return;
+  const q = UJI_PEMAHAMAN[latih.step];
+  const val = document.getElementById('ans-uraian').value.trim();
+  if(!val){ alert("Harap isi angka jawaban!"); return; }
+  
+  if(val === q.kunci){
+    latih.skor += 10; document.getElementById('skor-berlatih-angka').textContent = latih.skor;
+    showFb('bl-fb', 'ok', `✅ <b>Uraian Tepat! (+10 Poin)</b><br>${q.msg}`);
+  } else {
+    showFb('bl-fb', 'no', `❌ <b>Uraian Kurang Tepat!</b><br>Jawaban benar: ${q.kunci}. ${q.msg}`);
+  }
+  latih.state[latih.step].done = true; document.getElementById('berlatih-next').disabled = false;
+}
+
+function jawabTitik(idx){
+  if(latih.state[latih.step].done) return;
+  const q = UJI_PEMAHAMAN[latih.step];
+  const list = document.querySelectorAll('#berlatih-content .opsi');
+  list.forEach(el => el.style.pointerEvents = 'none');
+  
+  if(idx === q.j){
+    latih.skor += 10; document.getElementById('skor-berlatih-angka').textContent = latih.skor;
+    list[idx].classList.add('benar'); showFb('bl-fb', 'ok', `✅ <b>Isian Tepat! (+10 Poin)</b><br>${q.msg}`);
+  } else {
+    list[idx].classList.add('salah'); list[q.j].classList.add('benar');
+    showFb('bl-fb', 'no', `❌ <b>Isian Meleset!</b><br>${q.msg}`);
+  }
+  latih.state[latih.step].done = true; document.getElementById('berlatih-next').disabled = false;
+}
+
+function jawabJodohkan(){
+  if(latih.state[latih.step].done) return;
+  const q = UJI_PEMAHAMAN[latih.step];
+  let correct = true;
+  q.pasangan.forEach((_, i) => {
+    const sel = document.getElementById(`match-sel-${i}`).value;
+    if(parseInt(sel) !== i) correct = false;
+  });
+
+  if(correct){
+    latih.skor += 10; document.getElementById('skor-berlatih-angka').textContent = latih.skor;
+    showFb('bl-fb', 'ok', `✅ <b>Jodoh Pasangan Sempurna! (+10 Poin)</b><br>${q.msg}`);
+  } else {
+    showFb('bl-fb', 'no', `❌ <b>Pasangan Ada yang Keliru!</b><br>${q.msg}`);
+  }
+  latih.state[latih.step].done = true; document.getElementById('berlatih-next').disabled = false;
+}
+
+function jawabDragDrop(){
+  if(latih.state[latih.step].done) return;
+  const q = UJI_PEMAHAMAN[latih.step];
+  
+  let correct = true;
+  for(let i=0; i<q.kunciUrutan.length; i++){
+    if(currentDragItems[i] !== q.kunciUrutan[i]) correct = false;
+  }
+
+  if(correct){
+    latih.skor += 10; document.getElementById('skor-berlatih-angka').textContent = latih.skor;
+    showFb('bl-fb', 'ok', `✅ <b>Urutan Terverifikasi Runtut! (+10 Poin)</b><br>${q.msg}`);
+  } else {
+    showFb('bl-fb', 'no', `❌ <b>Urutan Langkah Masih Keliru!</b><br>Silakan susun kembali dengan urutan naik/turun yang benar.`);
+    return;
+  }
+  latih.state[latih.step].done = true; document.getElementById('berlatih-next').disabled = false;
+}
+
+function renderSkorLatih(){
+  gameProgress.berlatihSelesai = true;
+  document.getElementById('berlatih-sub').textContent='10 Audit Uji Pemahaman Selesai';
+  document.getElementById('berlatih-next').disabled=true;
+  
+  kirimKeGoogleSheets();
+
+  document.getElementById('berlatih-content').innerHTML=`
+    <div class="akhir">
+      <h2>⚖️ UJI PEMAHAMAN SELESAI!</h2>
+      <div class="identitas">${infoMurid.nama} • ${infoMurid.kelas}</div>
+      <p style="font-size:18px;margin-top:10px;color:var(--text-muted);">Nilai Uji Pemahaman Audit Keuangan:</p>
+      <p class="skor-angka">${latih.skor} / 100</p>
+      <p style="color:var(--accent-gold-light); font-weight:bold; margin-top:5px;">🔓 Kunci "Tunjuk Pelaku" Telah Terbuka di Menu Utama!</p>
+      <div style="display:flex; gap:12px; margin-top:10px;">
+        <button class="btn btn-gold" style="height:55px;padding:0 30px;font-size:17px;" onclick="startVonis()">⚖️ Masuk ke Sidang Vonis Sekarang ▶</button>
+        <button class="btn btn-gold" style="height:55px;padding:0 20px;font-size:15px; background:#475569;" onclick="goMenu()">☰ Kembali ke Menu</button>
+      </div>
+    </div>`;
+}
+
+/* SIDANG VONIS PENUNJUKAN PELAKU */
+function startVonis(){
+  if(!gameProgress.pemahamanSelesai || !gameProgress.berlatihSelesai){
+    alert("🔒 Akses ditolak! Selesaikan LKPD dan Uji Pemahaman terlebih dahulu.");
+    goMenu();
+    return;
+  }
+  showScreen('scr-vonis');
+  const c = document.getElementById('vonis-content');
+  
+  let cluesHTML = cluesCollected.map((cl, i) => `<div class="clue-box" style="margin-top:5px;"><b>Bukti ${i+1}:</b> ${cl}</div>`).join('');
+  if(!cluesHTML) cluesHTML = `<div style="color:var(--salah);">Belum ada clue terkumpul!</div>`;
+
+  let suspectsHTML = TERSANGKA.map((t, i) => `
+    <div class="suspect-card" id="suspect-${i}" onclick="pilihSuspect(${i})">
+      <div style="font-size:35px;">🕵️‍♂️</div>
+      <div>
+        <div style="font-size:18px; font-weight:900; color:var(--accent-gold-light);">${t.nama}</div>
+        <div style="font-size:13px; color:var(--text-muted);">${t.jabatan}</div>
+        <div style="font-size:12px; color:#CBD5E1; margin-top:4px;"><b>Alibi / Catatan:</b> ${t.alibi}</div>
+      </div>
+    </div>
+  `).join('');
+
+  c.innerHTML = `
+    <div class="soal-split">
+      <div class="soal-kiri" style="flex:0 0 42%; max-width:42%;">
+        <div class="soal-label">Bukti Clue Terkumpul (dari LKPD)</div>
+        <div style="overflow-y:auto; flex:1;">${cluesHTML}</div>
+      </div>
+      <div class="opsi-kanan" style="justify-content:flex-start;">
+        <div class="soal-label">Daftar Tersangka Penyelewengan</div>
+        ${suspectsHTML}
+        <button class="btn btn-gold" style="height:50px; font-size:17px; margin-top:10px;" onclick="eksekusiVonis()">🚨 EKSEKUSI PENANGKAPAN PELAKU</button>
+        <div class="feedback" id="vonis-fb"></div>
+      </div>
+    </div>`;
+}
+
+let selectedSuspect = null;
+function pilihSuspect(idx){
+  selectedSuspect = idx;
+  document.querySelectorAll('.suspect-card').forEach(el => el.classList.remove('selected'));
+  document.getElementById(`suspect-${idx}`).classList.add('selected');
+}
+
+function eksekusiVonis(){
+  if(selectedSuspect === null){ alert("Pilih salah satu tersangka terlebih dahulu!"); return; }
+  const t = TERSANGKA[selectedSuspect];
+  if(t.isPelaku){
+    showFb('vonis-fb', 'ok', `🎉 <b>VONIS TEPAT! ANALISIS MATEMATIKA TERBUKTI SAH!</b><br><b>${t.nama}</b> terbukti memanipulasi suku bunga tunggal Pak Damaran sejak bulan ke-3! Kasus Tanggo Rajo Resmi Ditutup dengan Kemenangan Detektif!`);
+  } else {
+    showFb('vonis-fb', 'no', `❌ <b>VONIS SALAH!</b><br>Bukti clue tidak cocok dengan ${t.nama}. Periksa kembali catatan alibi dan Kantung Bukti!`);
+  }
+}
+
+function kirimKeGoogleSheets() {
+  const payload = {
+    nama: infoMurid.nama,
+    kelas: infoMurid.kelas,
+    skorK1: skorPemahaman,
+    skorK2: latih.skor,
+    totalSkor: Math.round((skorPemahaman + latih.skor) / 2),
+    refleksi: "Telah memecahkan Kasus Tanggo Rajo: Bunga Tunggal & Barisan Aritmetika secara berurutan."
+  };
+
+  fetch(WEB_APP_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).catch(err => console.log(err));
+}
+</script>
+</body>
+</html>
